@@ -7,9 +7,21 @@ def emotion_detector(text_to_analyse):
     input_dict = { "raw_document": { "text": text_to_analyse } }
 
     response = requests.post(url, json = input_dict, headers=headers)
-    formatted_response = json.loads(response.text)
 
-    result = formatted_response['emotionPredictions'][0]['emotion']
-    result['dominant_emotion'] = max(result, key=result.get)
-    
+    # Si la réponse est valide (200)
+    if response.status_code == 200:
+        formatted_response = json.loads(response.text)
+        result = formatted_response['emotionPredictions'][0]['emotion']
+        result['dominant_emotion'] = max(result, key=result.get)
+        
+    # Si l'entrée est vide ou invalide (400)
+    elif response.status_code == 400:
+        result = {
+            'anger': None, 
+            'disgust': None, 
+            'fear': None, 
+            'joy': None, 
+            'sadness': None, 
+            'dominant_emotion': None
+        }
     return result
